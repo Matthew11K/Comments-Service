@@ -1,0 +1,49 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: comment_service_postgres
+    environment:
+      POSTGRES_DB: comment_service
+      POSTGRES_USER: comment
+      POSTGRES_PASSWORD: comment
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U comment -d comment_service"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  migrator:
+    image: migrate/migrate:v4.19.0
+    depends_on:
+      postgres:
+        condition: service_healthy
+    command:
+      - -path=/migrations
+      - -database=postgres://comment:comment@postgres:5432/comment_service?sslmode=disable
+      - up
+    volumes:
+      - ./migrations:/migrations:ro
+    restart: "no"
+
+  comment-service:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    depends_on:
+      migrator:
+        condition: service_completed_successfully
+    environment:
+      COMMENT_SERVICE_ENV: local
+      COMMENT_SERVICE_STORAGE_BACKEND: postgres
+      COMMENT_SERVICE_HTTP_ADDR: :8080
+      COMMENT_SERVICE_POSTGRES_DSN: postgres://comment:comment@postgres:5432/comment_service?sslmode=disable
+      COMMENT_SERVICE_GRAPHQL_ALLOWED_ORIGINS: http://localhost:3000,http://127.0.0.1:3000,http://localhost:8080,http://127.0.0.1:8080
+    ports:
+      - "8080:8080"
+
+volumes:
+  postgres_data:

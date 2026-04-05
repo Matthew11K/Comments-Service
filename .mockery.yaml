@@ -1,0 +1,19 @@
+all: false
+dir: mocks/application
+filename: "{{.InterfaceName}}.go"
+force-file-write: true
+formatter: goimports
+generate: true
+pkgname: applicationmocks
+structname: "{{.InterfaceName}}"
+template: testify
+template-data:
+  unroll-variadic: true
+packages:
+  github.com/Matthew11K/Comments-Service/internal/application:
+    interfaces:
+      TxManager:
+      PostRepository:
+      CommentRepository:
+      CommentEventPublisher:
+      CommentEventSubscriber:

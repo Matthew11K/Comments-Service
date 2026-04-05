@@ -1,0 +1,77 @@
+scalar UUID
+scalar Time
+
+type Query {
+  posts(first: Int!, after: String): PostConnection!
+  post(id: UUID!): Post
+}
+
+type Mutation {
+  createPost(input: CreatePostInput!): Post!
+  setCommentsEnabled(postId: UUID!, enabled: Boolean!): Post!
+  createComment(input: CreateCommentInput!): Comment!
+}
+
+type Subscription {
+  commentAdded(postId: UUID!): Comment!
+}
+
+type Post {
+  id: UUID!
+  authorId: UUID!
+  title: String!
+  content: String!
+  commentsEnabled: Boolean!
+  createdAt: Time!
+  comments(first: Int!, after: String): CommentConnection!
+}
+
+type Comment {
+  id: UUID!
+  postId: UUID!
+  parentId: UUID
+  authorId: UUID!
+  body: String!
+  createdAt: Time!
+  replies(first: Int!, after: String): CommentConnection!
+}
+
+type PostConnection {
+  totalCount: Int!
+  edges: [PostEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PostEdge {
+  cursor: String!
+  node: Post!
+}
+
+type CommentConnection {
+  totalCount: Int!
+  edges: [CommentEdge!]!
+  pageInfo: PageInfo!
+}
+
+type CommentEdge {
+  cursor: String!
+  node: Comment!
+}
+
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String
+}
+
+input CreatePostInput {
+  authorId: UUID!
+  title: String!
+  content: String!
+}
+
+input CreateCommentInput {
+  postId: UUID!
+  parentId: UUID
+  authorId: UUID!
+  body: String!
+}

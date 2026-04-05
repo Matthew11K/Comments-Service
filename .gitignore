@@ -1,0 +1,11 @@
+.DS_Store
+.idea/
+.cache/
+bin/
+coverage.out
+dist/
+tmp/
+*.log
+*.test
+*.out
+.env

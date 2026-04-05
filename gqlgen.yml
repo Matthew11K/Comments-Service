@@ -1,0 +1,39 @@
+schema:
+  - internal/adapters/graphql/schema.graphqls
+
+exec:
+  filename: internal/adapters/graphql/generated/generated.go
+  package: generated
+
+model:
+  filename: internal/adapters/graphql/graph/model/models_gen.go
+  package: model
+
+resolver:
+  layout: follow-schema
+  dir: internal/adapters/graphql
+  package: graphql
+
+models:
+  UUID:
+    model:
+      - github.com/google/uuid.UUID
+  Time:
+    model:
+      - time.Time
+  Post:
+    fields:
+      comments:
+        resolver: true
+  Comment:
+    fields:
+      replies:
+        resolver: true
+  PostConnection:
+    fields:
+      totalCount:
+        resolver: true
+  CommentConnection:
+    fields:
+      totalCount:
+        resolver: true
