@@ -20,14 +20,6 @@ func newErrorPresenter(logger *slog.Logger) gqlgraphql.ErrorPresenterFunc {
 			}
 		}
 
-		if _, ok := errors.AsType[*gqlerror.Error](err); ok {
-			if presented.Extensions == nil {
-				presented.Extensions = map[string]any{}
-			}
-			presented.Extensions["code"] = "GRAPHQL_ERROR"
-			return presented
-		}
-
 		if validationErr, ok := errors.AsType[*domain.ValidationError](err); ok {
 			presented.Message = validationErr.Message
 			presented.Extensions = map[string]any{"code": validationErr.Code()}
@@ -52,6 +44,14 @@ func newErrorPresenter(logger *slog.Logger) gqlgraphql.ErrorPresenterFunc {
 		if conflictErr, ok := errors.AsType[*domain.ConflictError](err); ok {
 			presented.Message = conflictErr.Error()
 			presented.Extensions = map[string]any{"code": conflictErr.Code()}
+			return presented
+		}
+
+		if _, ok := errors.AsType[*gqlerror.Error](err); ok {
+			if presented.Extensions == nil {
+				presented.Extensions = map[string]any{}
+			}
+			presented.Extensions["code"] = "GRAPHQL_ERROR"
 			return presented
 		}
 
